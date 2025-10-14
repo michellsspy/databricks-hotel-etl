@@ -1,4 +1,4 @@
-# databricks.yml (VERSÃO FINAL PARA FREE TRIAL COM DLT, SERVERLESS E BUNDLES)
+# databricks.yml (VERSÃO FINAL COM ESPECIFICAÇÃO DE CATÁLOGO)
 bundle:
   name: databricks_hotel_etl
 
@@ -9,14 +9,15 @@ resources:
   pipelines:
     dlt_hotel_pipeline:
       name: "DLT - Pipeline de ETL da Hotelaria"
-      target: "production.raw"
-
-      # MUDANÇA 1: Adicionamos a linha 'serverless: true' para cumprir a exigência do workspace.
+      
+      # MUDANÇA: Separamos o catálogo do schema.
+      catalog: "production" # <-- Adicionamos esta linha para especificar o catálogo.
+      target: "raw"         # <-- O 'target' agora é apenas o schema.
+      
       serverless: true
 
       libraries:
         - notebook:
-            # MUDANÇA 2: Removemos o '/Workspace' do início do caminho, como sugerido pelo aviso.
             path: "${workspace.root_path}/src/02_transient_to_raw/dlt_raw_pipeline.py"
       
       development: true
