@@ -1,0 +1,37 @@
+# databricks.yml (VERSÃO FINAL E SIMPLIFICADA)
+bundle:
+  name: databricks_hotel_etl
+
+workspace:
+  host: https://dbc-03ce1db1-207c.cloud.databricks.com
+
+# A secção 'artifacts' foi REMOVIDA, pois não é necessária para este projeto.
+# O Bundle irá incluir automaticamente os ficheiros referenciados nos jobs abaixo.
+
+resources:
+  jobs:
+    # Job 1: Executa um script Python puro
+    geracao_dados_iniciais_job:
+      name: "01 - Geração de Dados Iniciais"
+      tasks:
+        - task_key: "Gerar_Tabelas_Fonte"
+          existing_cluster_id: "cda8800db910fa45"
+          # CORRETO: Este é um script puro, então usamos spark_python_task
+          spark_python_task:
+            python_file: "src/01_generation/01_geracao_dados_iniciais.py"
+
+    # Job 2: Executa um ficheiro .py que é um notebook
+    pipeline_raw_job:
+      name: "02 - Pipeline Transient para Raw"
+      tasks:
+        - task_key: "Processar_Hoteis_Raw"
+          existing_cluster_id: "cda8800db910fa45"
+          # CORRETO: Este ficheiro tem "# Databricks notebook source", então usamos notebook_task
+          notebook_task:
+            notebook_path: "src/02_transient_to_raw/tb_hoteis_raw.py"
+
+targets:
+  dev:
+    mode: development
+    workspace:
+      root_path: /Users/${workspace.current_user.userName}/.bundle/${bundle.name}/dev
