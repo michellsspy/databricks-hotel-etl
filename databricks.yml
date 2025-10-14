@@ -1,31 +1,26 @@
-# databricks.yml (VERSÃO FINAL PARA FREE TRIAL COM DLT E BUNDLES)
+# databricks.yml (VERSÃO FINAL PARA FREE TRIAL COM DLT, SERVERLESS E BUNDLES)
 bundle:
   name: databricks_hotel_etl
 
 workspace:
   host: https://dbc-03ce1db1-207c.cloud.databricks.com
 
-# O Bundle irá incluir automaticamente os ficheiros referenciados nos resources.
-
 resources:
-  pipelines: # <-- MUDANÇA PRINCIPAL: de 'jobs' para 'pipelines'
-    # Nome do nosso recurso de pipeline
+  pipelines:
     dlt_hotel_pipeline:
-      # Nome que aparecerá na interface do Databricks
       name: "DLT - Pipeline de ETL da Hotelaria"
+      target: "production.raw"
 
-      # Onde o pipeline irá guardar as suas tabelas
-      target: "production.raw" # <-- O nosso schema da camada Raw
+      # MUDANÇA 1: Adicionamos a linha 'serverless: true' para cumprir a exigência do workspace.
+      serverless: true
 
-      # Indica que este é um pipeline de notebooks
       libraries:
         - notebook:
-            # Caminho para o ficheiro que contém a lógica do pipeline
-            path: "/Workspace${workspace.root_path}/src/02_transient_to_raw/dlt_raw_pipeline.py"
+            # MUDANÇA 2: Removemos o '/Workspace' do início do caminho, como sugerido pelo aviso.
+            path: "${workspace.root_path}/src/02_transient_to_raw/dlt_raw_pipeline.py"
       
-      # Configurações do pipeline
-      development: true # Modo de desenvolvimento para iterações mais rápidas
-      continuous: false # Executar apenas uma vez quando acionado (modo batch)
+      development: true
+      continuous: false
 
 targets:
   dev:
