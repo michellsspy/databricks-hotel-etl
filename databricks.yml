@@ -1,34 +1,31 @@
-# databricks.yml (VERSÃO FINAL E SIMPLIFICADA)
+# databricks.yml (VERSÃO FINAL PARA FREE TRIAL COM DLT E BUNDLES)
 bundle:
   name: databricks_hotel_etl
 
 workspace:
   host: https://dbc-03ce1db1-207c.cloud.databricks.com
 
-# A secção 'artifacts' foi REMOVIDA, pois não é necessária para este projeto.
-# O Bundle irá incluir automaticamente os ficheiros referenciados nos jobs abaixo.
+# O Bundle irá incluir automaticamente os ficheiros referenciados nos resources.
 
 resources:
-  jobs:
-    # Job 1: Executa um script Python puro
-    geracao_dados_iniciais_job:
-      name: "01 - Geração de Dados Iniciais"
-      tasks:
-        - task_key: "Gerar_Tabelas_Fonte"
-          existing_cluster_id: "cda8800db910fa45"
-          # CORRETO: Este é um script puro, então usamos spark_python_task
-          spark_python_task:
-            python_file: "src/01_generation/01_geracao_dados_iniciais.py"
+  pipelines: # <-- MUDANÇA PRINCIPAL: de 'jobs' para 'pipelines'
+    # Nome do nosso recurso de pipeline
+    dlt_hotel_pipeline:
+      # Nome que aparecerá na interface do Databricks
+      name: "DLT - Pipeline de ETL da Hotelaria"
 
-    # Job 2: Executa um ficheiro .py que é um notebook
-    pipeline_raw_job:
-      name: "02 - Pipeline Transient para Raw"
-      tasks:
-        - task_key: "Processar_Hoteis_Raw"
-          existing_cluster_id: "cda8800db910fa45"
-          # CORRETO: Este ficheiro tem "# Databricks notebook source", então usamos notebook_task
-          notebook_task:
-            notebook_path: "src/02_transient_to_raw/tb_hoteis_raw.py"
+      # Onde o pipeline irá guardar as suas tabelas
+      target: "production.raw" # <-- O nosso schema da camada Raw
+
+      # Indica que este é um pipeline de notebooks
+      libraries:
+        - notebook:
+            # Caminho para o ficheiro que contém a lógica do pipeline
+            path: "/Workspace${workspace.root_path}/src/02_transient_to_raw/dlt_raw_pipeline.py"
+      
+      # Configurações do pipeline
+      development: true # Modo de desenvolvimento para iterações mais rápidas
+      continuous: false # Executar apenas uma vez quando acionado (modo batch)
 
 targets:
   dev:
