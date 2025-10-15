@@ -1,4 +1,4 @@
-# databricks.yml (VERSÃO FINAL COM ESPECIFICAÇÃO DE CATÁLOGO)
+# databricks.yml 
 bundle:
   name: databricks_hotel_etl
 
@@ -9,16 +9,12 @@ resources:
   pipelines:
     dlt_hotel_pipeline:
       name: "DLT - Pipeline de ETL da Hotelaria"
-      
-      # MUDANÇA: Separamos o catálogo do schema.
-      catalog: "production" # <-- Adicionamos esta linha para especificar o catálogo.
-      target: "raw"         # <-- O 'target' agora é apenas o schema.
-      
+      catalog: "production"
+      target: "raw"
       serverless: true
-
       libraries:
         - notebook:
-            path: "${workspace.root_path}/src/02_transient_to_raw/dlt_raw_pipeline.py"
+            path: "${workspace.root_path}/files/src/02_transient_to_raw/dlt_raw_pipeline.py"
       
       development: true
       continuous: false
