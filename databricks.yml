@@ -14,7 +14,7 @@ resources:
       serverless: true
       libraries:
         - notebook:
-            path: "${workspace.root_path}/files/src/02_transient_to_raw/dlt_raw_pipeline.py"
+            path: "${workspace.root_path}/files/src/dlt_pipelines/dlt_raw_pipeline.py"
       
       development: true
       continuous: false
