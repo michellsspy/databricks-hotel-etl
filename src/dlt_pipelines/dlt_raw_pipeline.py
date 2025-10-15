@@ -1,62 +1,35 @@
 # Databricks notebook source
 import dlt
-from pyspark.sql.functions import *
 
-# --- Camada RAW ---
-# O objetivo desta camada é ser uma cópia 1-para-1 dos dados de origem,
-# garantindo um ponto de backup e auditoria.
+# --- Camada RAW (Ingestão Pura) ---
+# Esta camada agora apenas anexa (appends) os novos dados recebidos da fonte,
+# criando um log imutável e completo. Este é um processo em batch incremental.
 
-@dlt.table(
-  name="hoteis_raw",
-  comment="Cópia inicial da tabela de hoteis."
-)
+@dlt.table(name="hoteis_raw", comment="Carga Full da tabela de hoteis.")
 def hoteis_raw():
   return spark.read.table("production.transient.source_hoteis")
 
-
-@dlt.table(
-  name="quartos_raw",
-  comment="Cópia inicial da tabela de quartos."
-)
+@dlt.table(name="quartos_raw", comment="Carga Full da tabela de quartos.")
 def quartos_raw():
   return spark.read.table("production.transient.source_quartos")
 
-
-@dlt.table(
-  name="hospedes_raw",
-  comment="Cópia inicial da tabela de hospedes."
-)
+# As tabelas abaixo são incrementais (apenas append)
+@dlt.table(name="hospedes_raw", comment="Log incremental de alterações de hóspedes.")
 def hospedes_raw():
-  return spark.read.table("production.transient.source_hospedes")
+  return spark.readStream.table("production.transient.source_hospedes")
 
-
-@dlt.table(
-  name="reservas_raw",
-  comment="Cópia inicial da tabela de reservas."
-)
+@dlt.table(name="reservas_raw", comment="Log incremental de reservas.")
 def reservas_raw():
-  return spark.read.table("production.transient.source_reservas")
+  return spark.readStream.table("production.transient.source_reservas")
 
-
-@dlt.table(
-  name="reservas_canal_raw",
-  comment="Cópia inicial da tabela de reservas_canal."
-)
+@dlt.table(name="reservas_canal_raw", comment="Log incremental de canais de reserva.")
 def reservas_canal_raw():
-  return spark.read.table("production.transient.source_reservas_canal")
+  return spark.readStream.table("production.transient.source_reservas_canal")
 
-
-@dlt.table(
-  name="consumos_raw",
-  comment="Cópia inicial da tabela de consumos."
-)
+@dlt.table(name="consumos_raw", comment="Log incremental de consumos.")
 def consumos_raw():
-  return spark.read.table("production.transient.source_consumos")
+  return spark.readStream.table("production.transient.source_consumos")
 
-
-@dlt.table(
-  name="faturas_raw",
-  comment="Cópia inicial da tabela de faturas."
-)
+@dlt.table(name="faturas_raw", comment="Log incremental de faturas.")
 def faturas_raw():
-  return spark.read.table("production.transient.source_faturas")
+  return spark.readStream.table("production.transient.source_faturas")
