@@ -1,4 +1,4 @@
-# .github/workflows/deploy.yml (COLE ESTE CÓDIGO NO FICHEIRO)
+# .github/workflows/deploy.yml (VERSÃO COM --auto-approve)
 name: Validar e Implementar Bundle no Databricks
 
 on:
@@ -26,4 +26,5 @@ jobs:
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-        run: databricks bundle deploy -t dev
+        # MUDANÇA: Adicionamos a bandeira --auto-approve
+        run: databricks bundle deploy -t dev --auto-approve

@@ -15,7 +15,7 @@ resources:
     dlt_raw_pipeline:
       name: "DLT - 1. Pipeline Transient para Raw"
       catalog: "production"
-      target: "raw" # <-- O destino deste pipeline é o schema RAW.
+      target: "raw"
       serverless: true
       libraries:
         - notebook:
@@ -27,14 +27,11 @@ resources:
     dlt_trusted_pipeline:
       name: "DLT - 2. Pipeline Raw para Trusted"
       catalog: "production"
-      target: "trusted" # <-- O destino deste pipeline é o schema TRUSTED.
+      target: "trusted"
       serverless: true
       libraries:
         - notebook:
             path: "src/dlt_pipelines/dlt_trusted_pipeline.py"
-      # Adicionamos uma dependência para garantir que ele espere pelo pipeline Raw
-      depends_on:
-        - "pipelines.dlt_raw_pipeline"
       development: true
       continuous: false
 
