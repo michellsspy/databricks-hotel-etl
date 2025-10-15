@@ -25,7 +25,7 @@ resources:
         - notebook:
             path: "src/dlt_pipelines/dlt_raw_pipeline.ipynb"
         - notebook:
-            path: "src/dlt_pipelines/dlt_trusted_pipeline.ipynb"
+            path: "src/dlt_pipelines/dlt_trusted_pipeline.py"
       
       development: true
       continuous: false
