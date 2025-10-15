@@ -1,4 +1,4 @@
-# databricks.yml (VERSÃO COM AS CAMADAS RAW E TRUSTED)
+# databricks.yml 
 bundle:
   name: databricks_hotel_etl
 
