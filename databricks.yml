@@ -1,4 +1,4 @@
-# databricks.yml (VERSÃO FINAL COM ARQUITETURA MEDALLION CORRETA)
+# databricks.yml (VERSÃO FINAL COM TODAS AS CAMADAS MEDALLION)
 bundle:
   name: databricks_hotel_etl
 
@@ -32,6 +32,18 @@ resources:
       libraries:
         - notebook:
             path: "src/dlt_pipelines/dlt_trusted_pipeline.py"
+      development: true
+      continuous: false
+
+    # --- PIPELINE 3: TRUSTED -> REFINED ---
+    dlt_refined_pipeline:
+      name: "DLT - 3. Pipeline Trusted para Refined (Star Schema)"
+      catalog: "production"
+      target: "refined" # <-- O destino deste pipeline é o schema REFINED.
+      serverless: true
+      libraries:
+        - notebook:
+            path: "src/dlt_pipelines/dlt_refined_pipeline.py"
       development: true
       continuous: false
 
