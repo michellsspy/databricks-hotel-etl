@@ -1,26 +1,35 @@
-# databricks.yml 
+# databricks.yml (VERSÃO COM AS CAMADAS RAW E TRUSTED)
 bundle:
   name: databricks_hotel_etl
 
 workspace:
   host: https://dbc-03ce1db1-207c.cloud.databricks.com
 
+sync:
+  include:
+    - "src/**/*"
+
 resources:
   pipelines:
     dlt_hotel_pipeline:
       name: "DLT - Pipeline de ETL da Hotelaria"
+      # O nosso pipeline agora irá popular tanto a Raw quanto a Trusted
       catalog: "production"
-      target: "raw"
+      # O target define ONDE as tabelas são criadas, mas o DLT
+      # gere as dependências entre schemas internamente.
+      # Vamos apontar para o nosso schema final por enquanto.
+      target: "trusted"
       serverless: true
+      # MUDANÇA: Adicionamos o nosso novo notebook à lista de bibliotecas.
       libraries:
         - notebook:
-            path: "${workspace.root_path}/files/src/dlt_pipelines/dlt_raw_pipeline.py"
+            path: "src/dlt_pipelines/dlt_raw_pipeline.ipynb"
+        - notebook:
+            path: "src/dlt_pipelines/dlt_trusted_pipeline.ipynb"
       
       development: true
       continuous: false
 
 targets:
   dev:
-    mode: development
-    workspace:
-      root_path: /Users/${workspace.current_user.userName}/.bundle/${bundle.name}/dev
+    default: true
