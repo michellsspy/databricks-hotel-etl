@@ -1,9 +1,8 @@
-# src/02_transient_to_raw/dlt_raw_pipeline.py
+# Databricks notebook source  # <-- A LINHA MÁGICA QUE FALTAVA
 import dlt
 from pyspark.sql.functions import *
 
 # --- Camada RAW ---
-# O DLT vai executar estas funções na ordem correta.
 
 @dlt.table(
   name="hoteis_raw",
