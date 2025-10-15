@@ -4,10 +4,11 @@ from pyspark.sql.functions import col, current_timestamp
 
 # --- Camada TRUSTED (Prata) ---
 # O objetivo desta camada é consolidar o histórico da camada Raw,
-# apresentando apenas o estado atual e válido dos dados, limpos e padronizados.
+# apresentando apenas o estado atual e válido dos dados (SCD Type 1),
+# além de aplicar limpeza e padronização.
 
 # --- CARGAS COMPLETAS (FULL) ---
-# Estas tabelas são recriadas do zero a cada execução, espelhando a camada Raw.
+# Estas tabelas são recriadas do zero a cada execução.
 
 @dlt.table(
   name="hoteis_trusted",
@@ -45,20 +46,16 @@ def quartos_trusted():
     ).withColumn("data_carga_trusted", current_timestamp())
   )
 
-# --- CARGAS INCREMENTAIS COM UPSERT (SCD TYPE 1) ---
-# Estas tabelas leem o fluxo de alterações da camada Raw e aplicam um MERGE
-# (UPDATE + INSERT) para manter apenas o estado mais recente de cada registo.
+# --- BATCH INCREMENTAL COM UPSERT (SCD TYPE 1) ---
+# Lemos o fluxo de alterações da camada Raw e aplicamos um MERGE (UPDATE + INSERT).
 
 # Hóspedes (UPSERT)
 dlt.apply_changes(
   target = "hospedes_trusted",
-  source = dlt.read_stream("hospedes_raw"),
+  source = dlt.read_stream("hospedes_raw"), # Lê apenas as alterações da Raw
   keys = ["hospede_id"],
   sequence_by = col("data_modificacao"),
-  # Aplicamos as transformações (cast, select, etc.) aqui
-  apply_as_deletes = None, # Opcional: para lidar com registos apagados na fonte
-  except_column_list = [], # Opcional: colunas a ignorar durante o merge
-  stored_as_scd_type = 1
+  stored_as_scd_type = 1 # Garante que a Trusted tenha apenas o estado atual
 )
 
 # Reservas (UPSERT)
@@ -79,7 +76,7 @@ dlt.apply_changes(
   stored_as_scd_type = 1
 )
 
-# Consumos (UPSERT) - Embora geralmente sejam apenas insert, o padrão UPSERT é seguro
+# Consumos (UPSERT)
 dlt.apply_changes(
   target = "consumos_trusted",
   source = dlt.read_stream("consumos_raw"),
