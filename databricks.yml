@@ -1,4 +1,4 @@
-# databricks.yml (VERSÃO FINAL COM TODOS OS SCRIPTS PADRONIZADOS PARA .py)
+# databricks.yml (VERSÃO FINAL COM ARQUITETURA MEDALLION CORRETA)
 bundle:
   name: databricks_hotel_etl
 
@@ -11,18 +11,30 @@ sync:
 
 resources:
   pipelines:
-    dlt_hotel_pipeline:
-      name: "DLT - Pipeline de ETL da Hotelaria"
+    # --- PIPELINE 1: TRANSIENT -> RAW ---
+    dlt_raw_pipeline:
+      name: "DLT - 1. Pipeline Transient para Raw"
       catalog: "production"
-      target: "trusted"
+      target: "raw" # <-- O destino deste pipeline é o schema RAW.
       serverless: true
       libraries:
         - notebook:
-            # MUDANÇA: Atualizamos o caminho para o ficheiro .py
             path: "src/dlt_pipelines/dlt_raw_pipeline.py"
+      development: true
+      continuous: false
+
+    # --- PIPELINE 2: RAW -> TRUSTED ---
+    dlt_trusted_pipeline:
+      name: "DLT - 2. Pipeline Raw para Trusted"
+      catalog: "production"
+      target: "trusted" # <-- O destino deste pipeline é o schema TRUSTED.
+      serverless: true
+      libraries:
         - notebook:
             path: "src/dlt_pipelines/dlt_trusted_pipeline.py"
-      
+      # Adicionamos uma dependência para garantir que ele espere pelo pipeline Raw
+      depends_on:
+        - "pipelines.dlt_raw_pipeline"
       development: true
       continuous: false
 
