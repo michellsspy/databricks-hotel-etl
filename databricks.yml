@@ -1,78 +1,17 @@
-# databricks.yml (VERSÃO FINAL COM ORQUESTRADOR DE WORKFLOW)
+# databricks.yml (VERSÃO FINAL ULTRA MODULARIZADA)
 bundle:
   name: databricks_hotel_etl
 
 workspace:
   host: https://dbc-03ce1db1-207c.cloud.databricks.com
 
+# O 'include' agora apanha os novos nomes de ficheiro.
+include:
+  - "resources/*.yml"
+
 sync:
   include:
     - "src/**/*"
-
-resources:
-  # --- DEFINIÇÃO DOS NOSSOS PIPELINES DLT (AS PEÇAS) ---
-  pipelines:
-    dlt_raw_pipeline:
-      name: "DLT - 1. Pipeline Transient para Raw"
-      # ... (o resto da definição continua igual)
-      catalog: "production"
-      target: "raw"
-      serverless: true
-      libraries:
-        - notebook:
-            path: "src/dlt_pipelines/dlt_raw_pipeline.py"
-      development: true
-      continuous: false
-
-    dlt_trusted_pipeline:
-      name: "DLT - 2. Pipeline Raw para Trusted"
-      # ... (o resto da definição continua igual)
-      catalog: "production"
-      target: "trusted"
-      serverless: true
-      libraries:
-        - notebook:
-            path: "src/dlt_pipelines/dlt_trusted_pipeline.py"
-      development: true
-      continuous: false
-
-    dlt_refined_pipeline:
-      name: "DLT - 3. Pipeline Trusted para Refined (Star Schema)"
-      # ... (o resto da definição continua igual)
-      catalog: "production"
-      target: "refined"
-      serverless: true
-      libraries:
-        - notebook:
-            path: "src/dlt_pipelines/dlt_refined_pipeline.py"
-      development: true
-      continuous: false
-
-  # --- DEFINIÇÃO DO NOSSO ORQUESTRADOR (A LINHA DE MONTAGEM) ---
-  jobs:
-    medallion_orchestrator_job:
-      name: "JOB - Orquestrador do Pipeline Medallion Completo"
-      tasks:
-        # TAREFA 1: Executar o pipeline Raw
-        - task_key: "Executar_Pipeline_Raw"
-          pipeline_task:
-            # Aponta para o pipeline DLT que definimos acima
-            pipeline_id: ${resources.pipelines.dlt_raw_pipeline.id}
-        
-        # TAREFA 2: Executar o pipeline Trusted
-        - task_key: "Executar_Pipeline_Trusted"
-          pipeline_task:
-            pipeline_id: ${resources.pipelines.dlt_trusted_pipeline.id}
-          # A MAGIA DA ORQUESTRAÇÃO: Define a dependência de execução
-          depends_on:
-            - task_key: "Executar_Pipeline_Raw"
-
-        # TAREFA 3: Executar o pipeline Refined
-        - task_key: "Executar_Pipeline_Refined"
-          pipeline_task:
-            pipeline_id: ${resources.pipelines.dlt_refined_pipeline.id}
-          depends_on:
-            - task_key: "Executar_Pipeline_Trusted"
 
 targets:
   dev:

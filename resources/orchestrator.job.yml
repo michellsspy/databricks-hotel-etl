@@ -1,0 +1,23 @@
+# resources/orchestrator.job.yml
+# Define o Workflow que orquestra a execução dos pipelines DLT em sequência.
+
+resources:
+  jobs:
+    medallion_orchestrator_job:
+      name: "JOB - Orquestrador do Pipeline Medallion Completo"
+      tasks:
+        - task_key: "Executar_Pipeline_Raw"
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.dlt_raw_pipeline.id}
+        
+        - task_key: "Executar_Pipeline_Trusted"
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.dlt_trusted_pipeline.id}
+          depends_on:
+            - task_key: "Executar_Pipeline_Raw"
+
+        - task_key: "Executar_Pipeline_Refined"
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.dlt_refined_pipeline.id}
+          depends_on:
+            - task_key: "Executar_Pipeline_Trusted"

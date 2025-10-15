@@ -1,0 +1,15 @@
+# resources/dlt_trusted.pipeline.yml
+# Define o pipeline responsável pela transição: Raw -> Trusted
+
+resources:
+  pipelines:
+    dlt_trusted_pipeline:
+      name: "DLT - 2. Pipeline Raw para Trusted"
+      catalog: "production"
+      target: "trusted"
+      serverless: true
+      libraries:
+        - notebook:
+            path: "../src/dlt_pipelines/dlt_trusted_pipeline.py"
+      development: true
+      continuous: false
